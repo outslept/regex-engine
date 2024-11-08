@@ -133,21 +133,52 @@ function parseBracket(regex, ctx) {
  * @param {ParseContext} ctx
  */
 function parseOr(regex, ctx) {
-  const leftTokens = ctx.tokens;
+  const leftTokens = ctx.tokens
   ctx.tokens = []
 
-  ctx.pos++;
-  while (regex[ctx.pos] !== ')' && ctx.pos <regex.length) {
-    process(regex, ctx);
-    ctx.pos++;
+  ctx.pos++
+  while (regex[ctx.pos] !== ')' && ctx.pos < regex.length) {
+    process(regex, ctx)
+    ctx.pos++
   }
 
-  const rightTokens = ctx.tokens;
-  ctx.tokens = [{
-    tokenType: TokenType.OR,
-    value: [leftTokens, rightTokens],
-  }]
+  const rightTokens = ctx.tokens
+  ctx.tokens = [
+    {
+      tokenType: TokenType.OR,
+      value: [leftTokens, rightTokens],
+    },
+  ]
 }
 
-function parseRepeat() {}
+/**
+ * Repeat expression
+ * @param {string} regex
+ * @param {ParseContext} ctx
+ */
+function parseRepeat(regex, ctx) {
+  const lastToken = ctx.tokens.pop() // Get the last token (which will be repeated)
+  let min, max
+
+  switch (regex[ctx.pos]) {
+    case '*':
+      min = 0
+      max = Infinity // * means 0 or more
+      break
+    case '+':
+      min = 1
+      max = Infinity // + means 1 or more
+      break
+    case '?':
+      min = 0
+      max = 1 // ? means 0 or 1
+      break
+  }
+
+  ctx.tokens.push({
+    tokenType: TokenType.REPEAT,
+    value: { min, max, token: lastToken },
+  })
+}
+
 function parseRepeatSpecified() {}
