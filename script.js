@@ -322,3 +322,20 @@ function tokenToNfa(token) {
       break
   }
 }
+
+/**
+ * List of tokens to NFA
+ * @param {Token[]} tokens
+ * @returns {[NFAState, NFAState]}
+ */
+function tokensToNfa(tokens) {
+  let [start, end] = tokenToNfa(tokens[0])
+
+  for (let i = 1; i < tokens.length; i++) {
+    const [nextStart, nextEnd] = tokenToNfa(tokens[i])
+    end.transitions[epsilonChar] = [nextStart] // Chain the NFAs together
+    end = nextEnd
+  }
+
+  return [start, end]
+}
