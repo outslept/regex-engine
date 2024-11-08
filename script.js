@@ -36,7 +36,7 @@ function createParseContext(regex) {
 
 /**
  * Parse a regex string, return parsing ctx
- * @param {string} regex 
+ * @param {string} regex
  * @returns {ParseContext}
  */
 function parse(regex) {
@@ -52,8 +52,8 @@ function parse(regex) {
 
 /**
  * Process a single ch and generate tokens
- * @param {string} regex 
- * @param {ParseContext} ctx 
+ * @param {string} regex
+ * @param {ParseContext} ctx
  */
 function process(regex, ctx) {
   const ch = regex[ctx.pos]
@@ -78,24 +78,55 @@ function process(regex, ctx) {
 
 /**
  * Group expression
- * @param {string} regex 
- * @param {ParseContext} ctx 
+ * @param {string} regex
+ * @param {ParseContext} ctx
  */
 function parseGroup(regex, ctx) {
-  ctx.pos++; // To move past the '('
-  const groupCtx = createParseContext(regex);
+  ctx.pos++ // To move past the '('
+  const groupCtx = createParseContext(regex)
 
-  while(regex[ctx.pos] !== ')') {
-    process(regex, groupCtx);
-    ctx.pos++;
+  while (regex[ctx.pos] !== ')') {
+    process(regex, groupCtx)
+    ctx.pos++
   }
 
   ctx.tokens.push({
     tokenType: TokenType.GROUP,
-    value: groupCtx.tokens
+    value: groupCtx.tokens,
   })
 }
-function parseBracket() {}
+
+/**
+ * Bracket expression
+ * @param {string} regex
+ * @param {ParseContext} ctx
+ */
+function parseBracket(regex, ctx) {
+  ctx.pos++ // Move past '['
+  const literals = []
+
+  while (regex[ctx.pos] !== ']') {
+    const ch = regex[ctx.pos]
+
+    if (ch === '-') {
+      const prev = literals.pop()
+      const next = regex[ctx.pos + 1]
+      for (let i = prev.charCodeAt(0); i <= next.charCodeAt(0); i++) {
+        literals.push(String.fromCharCode(i))
+      }
+      ctx.pos++ // Skip next character
+    } else {
+      literals.push(ch)
+    }
+    ctx.pos++
+  }
+
+  ctx.tokens.push({
+    tokenType: TokenType.BRACKET,
+    value: literals,
+  })
+}
+
 function parseOr() {}
 function parseRepeat() {}
 function parseRepeatSpecified() {}
