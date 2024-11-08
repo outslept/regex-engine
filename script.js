@@ -339,3 +339,18 @@ function tokensToNfa(tokens) {
 
   return [start, end]
 }
+
+/**
+ * Convert tokens to NFA.
+ * @param {ParseContext} ctx
+ * @returns {NFAState}
+ */
+function buildNfa(ctx) {
+  const [startState, endState] = tokensToNfa(ctx.tokens)
+
+  // Add a terminal state
+  const terminalState = createState(false, true)
+  endState.transitions[epsilonChar] = [terminalState] // Connect to the terminal state
+
+  return startState // Return the entry point of the NFA
+}
