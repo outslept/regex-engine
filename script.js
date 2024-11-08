@@ -354,3 +354,21 @@ function buildNfa(ctx) {
 
   return startState // Return the entry point of the NFA
 }
+
+const startOfText = '^'; // The start of the input
+const endOfText = '$'; // The end of the input
+
+/**
+ * Specific position char
+ * @param {string} input
+ * @param {number} pos
+ * @returns {string}
+ */
+function getChar(input, pos) {
+  if (pos < 0) {
+    return startOfText;
+  } else if (pos >= input.length) {
+    return endOfText;
+  }
+  return input[pos];
+}
