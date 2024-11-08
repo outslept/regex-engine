@@ -271,5 +271,21 @@ function tokenToNfa(token) {
         start.transitions[char].push(end)
       })
       break
+
+    case TokenType.GROUP:
+    case TokenType.GROUP_UNCAPTURED:
+      // Group: process each token in the group and concatenate them
+      const groupTokens = token.value
+      let [groupStart, groupEnd] = tokenToNfa(groupTokens[0]) // Start with the first token
+
+      for (let i = 1; i < groupTokens.length; i++) {
+        const [nextStart, nextEnd] = tokenToNfa(groupTokens[i])
+        groupEnd.transitions[epsilonChar] = [nextStart] // Link end of previous NFA to start of next
+        groupEnd = nextEnd // Update the end state
+      }
+
+      start.transitions[epsilonChar] = [groupStart]
+      groupEnd.transitions[epsilonChar] = [end]
+      break
   }
 }
