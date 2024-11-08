@@ -234,3 +234,42 @@ function createState(start = false, terminal = false) {
     transitions: {},
   }
 }
+
+const epsilonChar = ''
+
+/**
+ * token into an NFA
+ * @param {Token} token
+ * @return {[NFAState, NFAState]}
+ */
+function tokenToNfa(token) {
+  const start = createState()
+  const end = createState()
+
+  switch (token.tokenType) {
+    case TokenType.LITERAL:
+      // Literal: single transition from start to end
+      start.transitions[token.value] = [end]
+      break
+
+    case TokenType.OR:
+      // OR: two branches, each from start to end
+      const [left, right] = token.value
+      const [leftStart, leftEnd] = tokenToNfa(left)
+      const [rightStart, rightEnd] = tokenToNfa(right)
+      start.transitions[epsilonChar] = [leftStart, rightStart]
+      leftEnd.transitions[epsilonChar] = [end]
+      rightEnd.transitions[epsilonChar] = [end]
+      break
+
+    case TokenType.BRACKET:
+      // Bracket: multiple transitions for each char in the set
+      token.value.forEach((char) => {
+        if (!start.transitions[char]) {
+          start.transitions[char] = []
+        }
+        start.transitions[char].push(end)
+      })
+      break
+  }
+}
