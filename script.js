@@ -76,7 +76,25 @@ function process(regex, ctx) {
   }
 }
 
-function parseGroup() {}
+/**
+ * Group expression
+ * @param {string} regex 
+ * @param {ParseContext} ctx 
+ */
+function parseGroup(regex, ctx) {
+  ctx.pos++; // To move past the '('
+  const groupCtx = createParseContext(regex);
+
+  while(regex[ctx.pos] !== ')') {
+    process(regex, groupCtx);
+    ctx.pos++;
+  }
+
+  ctx.tokens.push({
+    tokenType: TokenType.GROUP,
+    value: groupCtx.tokens
+  })
+}
 function parseBracket() {}
 function parseOr() {}
 function parseRepeat() {}
