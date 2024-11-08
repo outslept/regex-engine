@@ -355,8 +355,8 @@ function buildNfa(ctx) {
   return startState // Return the entry point of the NFA
 }
 
-const startOfText = '^'; // The start of the input
-const endOfText = '$'; // The end of the input
+const startOfText = '^' // The start of the input
+const endOfText = '$' // The end of the input
 
 /**
  * Specific position char
@@ -366,9 +366,43 @@ const endOfText = '$'; // The end of the input
  */
 function getChar(input, pos) {
   if (pos < 0) {
-    return startOfText;
+    return startOfText
   } else if (pos >= input.length) {
-    return endOfText;
+    return endOfText
   }
-  return input[pos];
+  return input[pos]
+}
+
+/**
+ * @param {NFAState} state
+ * @param {string} input
+ * @param {number} pos
+ * @returns {boolean}
+ */
+function check(state, input, pos) {
+  const ch = getChar(input, pos)
+
+  // Terminal state and at the end of the input = a match.
+  if (ch === endOfText && state.terminal) {
+    return true
+  }
+
+  if (state.transitions[ch]) {
+    for (let nextState of state.transitions[ch]) {
+      if (check(nextState, input, pos + 1)) {
+        return true // Match found
+      }
+    }
+  }
+
+  // Check for empty transitions
+  if (state.transitions[epsilonChar]) {
+    for (let nextState of state.transitions[epsilonChar]) {
+      if (check(nextState, input, pos)) {
+        return true
+      }
+    }
+  }
+
+  return false
 }
