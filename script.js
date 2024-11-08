@@ -34,6 +34,11 @@ function createParseContext(regex) {
   }
 }
 
+/**
+ * Parse a regex string, return parsing ctx
+ * @param {string} regex 
+ * @returns {ParseContext}
+ */
 function parse(regex) {
   const ctx = createParseContext(regex)
 
@@ -45,6 +50,11 @@ function parse(regex) {
   return ctx
 }
 
+/**
+ * Process a single ch and generate tokens
+ * @param {string} regex 
+ * @param {ParseContext} ctx 
+ */
 function process(regex, ctx) {
   const ch = regex[ctx.pos]
 
