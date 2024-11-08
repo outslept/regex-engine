@@ -43,7 +43,7 @@ function parse(regex) {
   const ctx = createParseContext(regex)
 
   while (ctx.pos < regex.length) {
-    ProcessingInstruction(regex, ctx)
+    process(regex, ctx)
     ctx.pos++
   }
 
@@ -405,4 +405,24 @@ function check(state, input, pos) {
   }
 
   return false
+}
+
+/**
+ * @param {string} regex
+ * @param {string} input
+ * @returns {boolean}
+ */
+function match(regex, input) {
+  const parseContext = parse(regex)
+  console.log('Parsed tokens:', parseContext.tokens)
+
+  const nfaStartState = buildNfa(parseContext)
+  console.log('NFA built successfully.')
+
+  const result = check(nfaStartState, input, 0)
+  console.log(
+    `Matching result for input "${input}" against regex "${regex}":`,
+    result,
+  )
+  return result
 }
