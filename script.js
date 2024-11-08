@@ -7,7 +7,7 @@ const TokenType = {
   OR: 2,
   REPEAT: 3,
   LITERAL: 4,
-  GROUP_UNCAPTURED: 5
+  GROUP_UNCAPTURED: 5,
 }
 
 /**
@@ -33,3 +33,41 @@ function createParseContext(regex) {
     tokens: [],
   }
 }
+
+function parse(regex) {
+  const ctx = createParseContext(regex)
+
+  while (ctx.pos < regex.length) {
+    ProcessingInstruction(regex, ctx)
+    ctx.pos++
+  }
+
+  return ctx
+}
+
+function process(regex, ctx) {
+  const ch = regex[ctx.pos]
+
+  if (ch === '(') {
+    parseGroup(regex, ctx)
+  } else if (ch === '[') {
+    parseBracket(regex, ctx)
+  } else if (ch === '|') {
+    parseOr(regex, ctx)
+  } else if (['*', '?', '+'].includes(ch)) {
+    parseRepeat(regex, ctx)
+  } else if (ch === '{') {
+    parseRepeatSpecified(regex, ctx)
+  } else {
+    ctx.tokens.push({
+      tokenType: TokenType.LITERAL,
+      value: ch,
+    })
+  }
+}
+
+function parseGroup() {}
+function parseBracket() {}
+function parseOr() {}
+function parseRepeat() {}
+function parseRepeatSpecified() {}
