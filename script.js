@@ -21,3 +21,15 @@ const TokenType = {
  * @property {number} pos
  * @property {Token[]} tokens
  */
+
+/**
+ * Create a new parse context.
+ * @param {string} regex
+ * @returns {ParseContext}
+ */
+function createParseContext(regex) {
+  return {
+    pos: 0,
+    tokens: [],
+  }
+}
