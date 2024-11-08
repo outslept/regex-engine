@@ -287,5 +287,38 @@ function tokenToNfa(token) {
       start.transitions[epsilonChar] = [groupStart]
       groupEnd.transitions[epsilonChar] = [end]
       break
+
+    case TokenType.REPEAT:
+      const repeatPayload = token.value
+      const [repeatStart, repeatEnd] = tokenToNfa(repeatPayload.token) // NFA for the repeated token
+
+      // Handle the minimum number of repetitions
+      if (repeatPayload.min === 0) {
+        start.transitions[epsilonChar] = [end] // Allow skipping the repeated token
+      }
+
+      let prevStart = repeatStart
+      let prevEnd = repeatEnd
+
+      for (let i = 1; i < repeatPayload.min; i++) {
+        const [nextStart, nextEnd] = tokenToNfa(repeatPayload.token)
+        prevEnd.transitions[epsilonChar] = [nextStart] // Connect the previous NFA to the next one
+        prevEnd = nextEnd
+      }
+
+      // Handle the maximum number of repetitions
+      if (repeatPayload.max === Infinity) {
+        prevEnd.transitions[epsilonChar] = [repeatStart] // Infinite loop for unlimited repetitions
+      } else {
+        for (let i = repeatPayload.min; i < repeatPayload.max; i++) {
+          const [nextStart, nextEnd] = tokenToNfa(repeatPayload.token)
+          prevEnd.transitions[epsilonChar] = [nextStart]
+          prevEnd = nextEnd
+        }
+      }
+
+      prevEnd.transitions[epsilonChar] = [end] // Final link to the end state
+      start.transitions[epsilonChar] = [repeatStart]
+      break
   }
 }
