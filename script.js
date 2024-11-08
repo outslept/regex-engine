@@ -181,4 +181,34 @@ function parseRepeat(regex, ctx) {
   })
 }
 
-function parseRepeatSpecified() {}
+/**
+ * Specified repeat expression
+ * @param {string}
+ * @param {ParseContext}
+ */
+function parseRepeatSpecified(regex, ctx) {
+  ctx.pos++; // Move past '{'
+  let min = '', max = '';
+  let inMin = true;
+
+  while (regex[ctx.pos] !== '}') {
+    const ch =regex[ctx.pos];
+    if (ch === ',') {
+      inMin = false; // Switch to reading max
+    } else if (inMin) {
+      min += ch;
+    } else {
+      max += ch;
+    }
+    ctx.pos++
+  }
+
+  min = parseInt(min, 10);
+  max = max ? parseInt(max, 10) : Infinity
+  const lastToken = ctx.tokens.pop();
+
+  ctx.tokens.push({
+    tokenType: TokenType.REPEAT,
+    value: { min, max, token: lastToken },
+  })
+}
