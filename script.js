@@ -187,28 +187,50 @@ function parseRepeat(regex, ctx) {
  * @param {ParseContext}
  */
 function parseRepeatSpecified(regex, ctx) {
-  ctx.pos++; // Move past '{'
-  let min = '', max = '';
-  let inMin = true;
+  ctx.pos++ // Move past '{'
+  let min = '',
+    max = ''
+  let inMin = true
 
   while (regex[ctx.pos] !== '}') {
-    const ch =regex[ctx.pos];
+    const ch = regex[ctx.pos]
     if (ch === ',') {
-      inMin = false; // Switch to reading max
+      inMin = false // Switch to reading max
     } else if (inMin) {
-      min += ch;
+      min += ch
     } else {
-      max += ch;
+      max += ch
     }
     ctx.pos++
   }
 
-  min = parseInt(min, 10);
+  min = parseInt(min, 10)
   max = max ? parseInt(max, 10) : Infinity
-  const lastToken = ctx.tokens.pop();
+  const lastToken = ctx.tokens.pop()
 
   ctx.tokens.push({
     tokenType: TokenType.REPEAT,
     value: { min, max, token: lastToken },
   })
+}
+
+/**
+ * @typedef {Object} NFAState
+ * @property {boolean} start
+ * @property {boolean} terminal
+ * @property {Object.<string, NFAState[]>} transitions
+ */
+
+/**
+ * NFA state
+ * @param {boolean} [start=false]
+ * @param {boolean} [terminal=false]
+ * @returns {NFAState}
+ */
+function createState(start = false, terminal = false) {
+  return {
+    start,
+    terminal,
+    transitions: {},
+  }
 }
