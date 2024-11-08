@@ -127,6 +127,27 @@ function parseBracket(regex, ctx) {
   })
 }
 
-function parseOr() {}
+/**
+ * OR expression
+ * @param {string} regex
+ * @param {ParseContext} ctx
+ */
+function parseOr(regex, ctx) {
+  const leftTokens = ctx.tokens;
+  ctx.tokens = []
+
+  ctx.pos++;
+  while (regex[ctx.pos] !== ')' && ctx.pos <regex.length) {
+    process(regex, ctx);
+    ctx.pos++;
+  }
+
+  const rightTokens = ctx.tokens;
+  ctx.tokens = [{
+    tokenType: TokenType.OR,
+    value: [leftTokens, rightTokens],
+  }]
+}
+
 function parseRepeat() {}
 function parseRepeatSpecified() {}
